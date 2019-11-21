@@ -4,14 +4,6 @@ Created on Thu Nov 14 20:00:23 2019
 
 @author: dingxu
 """
-
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Nov 13 15:20:11 2019
-
-@author: dingxu
-"""
-
 from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,15 +15,17 @@ import os
 
 
 
-fitsname1 = 'd8549.0092.fits'
-fitsname2 = 'd8549.0089.fits'
+fitsname2 = 'E:/shunbianyuan/code/phot/'+'d8549.0092.fits'
+fitsname1 = 'E:/shunbianyuan/code/phot/'+'d8549.0089.fits'
 
 onehdu = fits.open(fitsname1)
-oneimgdata = onehdu[1].data  #hdu[0].header
+data1 = onehdu[1].data  #hdu[0].header
+oneimgdata = np.copy(data1)
 hang1,lie1 = oneimgdata.shape
 
 twohdu = fits.open(fitsname2)
-twoimgdata = twohdu[1].data  #hdu[0].header
+data2 = twohdu[1].data  #hdu[0].header
+twoimgdata = np.copy(data2)
 hang2,lie2 = twoimgdata.shape
 
 
@@ -137,12 +131,12 @@ for i in range(lenpipei):
     plt.plot([x10,x11+lie1],[y10,y11],linewidth = 0.8)
 
 H, mask = cv2.findHomography(src_pts, dst_pts, cv2.RANSAC,5.0)
-newimg1 = cv2.warpPerspective(oneimgdata, H, (lie1,hang1))
+newimg1 = cv2.warpPerspective(data1, H, (lie1,hang1))
 minnewimg1,maxnewimg1 = adjustimage(newimg1,3)
 plt.figure(3)
 plt.imshow(newimg1, cmap='gray', vmin = minnewimg1, vmax = maxnewimg1)
 
-minusimg = np.float32(newimg1) - np.float32(twoimgdata)
+minusimg = np.float32(newimg1) - np.float32(data2)
 minjian,maxjian = adjustimage(minusimg,3)
 plt.figure(3)
 plt.imshow(minusimg, cmap='gray', vmin = minjian, vmax = maxjian)
@@ -155,4 +149,4 @@ def witefits(data,name):
     greyHDU.writeto(name + '.fits')
     
 witefits(newimg1,'one')   
-witefits(twoimgdata,'two')     
+witefits(data2,'two')     
